@@ -13,7 +13,7 @@ int main(void) {
     int rc;
     long num_cores = sysconf(_SC_NPROCESSORS_ONLN);
     pthread_t hilos[num_cores];
-    long t; // Declarada aquí para evitar errores de C99 y redefinición
+    long t; 
 
     printf("Cores: %ld\n", num_cores);
 
