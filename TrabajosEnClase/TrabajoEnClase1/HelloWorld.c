@@ -5,6 +5,7 @@
 void* mi_funcion(void* argumento){
     long id = (long)argumento; 
     printf("Hola Mundo desde el hilo #%ld\n", id);
+    sleep(1)
     return NULL;
 }
 
