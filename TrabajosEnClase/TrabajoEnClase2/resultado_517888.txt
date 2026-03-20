@@ -1,0 +1,43 @@
+Cores: 40
+En main: creando el hilo 0
+En main: creando el hilo 1
+En main: creando el hilo 2
+En main: creando el hilo 3
+En main: creando el hilo 4
+En main: creando el hilo 5
+En main: creando el hilo 6
+En main: creando el hilo 7
+En main: creando el hilo 8
+En main: creando el hilo 9
+En main: creando el hilo 10
+En main: creando el hilo 11
+En main: creando el hilo 12
+En main: creando el hilo 13
+En main: creando el hilo 14
+En main: creando el hilo 15
+En main: creando el hilo 16
+En main: creando el hilo 17
+En main: creando el hilo 18
+En main: creando el hilo 19
+En main: creando el hilo 20
+En main: creando el hilo 21
+En main: creando el hilo 22
+En main: creando el hilo 23
+En main: creando el hilo 24
+En main: creando el hilo 25
+En main: creando el hilo 26
+En main: creando el hilo 27
+En main: creando el hilo 28
+En main: creando el hilo 29
+En main: creando el hilo 30
+En main: creando el hilo 31
+En main: creando el hilo 32
+En main: creando el hilo 33
+En main: creando el hilo 34
+En main: creando el hilo 35
+En main: creando el hilo 36
+En main: creando el hilo 37
+En main: creando el hilo 38
+En main: creando el hilo 39
+Valor de num1: 31967
+Valor de num2: 33416846
