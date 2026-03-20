@@ -22,7 +22,7 @@ int main(void) {
     printf("Cores: %ld\n", num_cores);
 
     // Primer bucle: Creación
-    for(int t=0; t < num_cores; t++) {
+    for(long t=0; t < num_cores; t++) {
         printf("En main: creando el hilo %ld\n", t);
         rc = pthread_create(&hilos[t], NULL, mi_funcion, (void*)t);
         if (rc) {
@@ -30,7 +30,7 @@ int main(void) {
         }
     }
       // Segundo bucle: Espera
-    for(int t = 0; t < num_cores; t++) {
+    for(long t = 0; t < num_cores; t++) {
         pthread_join(hilos[t], NULL);
     }
       printf("Valor de num1: %d\n", num1);
