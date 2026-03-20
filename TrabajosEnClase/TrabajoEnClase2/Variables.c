@@ -5,7 +5,8 @@
 int num1=0;
 int num2=0;
 void* mi_funcion(void* argumento){
-    for (int i=0; i<1000;i++){
+    int i=0;
+    for ( i=0; i<1000;i++){
       num1++;
     }
     return NULL;
