@@ -9,6 +9,9 @@ void* mi_funcion(void* argumento){
     for ( i=0; i<1000;i++){
       num1++;
     }
+    for ( i=0; i<10000000;i++){
+      num2++;
+    }
     return NULL;
 }
 int main(void) {
@@ -32,6 +35,7 @@ int main(void) {
         pthread_join(hilos[t], NULL);
     }
       printf("Valor de num1: %d\n", num1);
+        printf("Valor de num2: %d\n", num2);
     }
 
     
