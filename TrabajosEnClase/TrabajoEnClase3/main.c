@@ -45,12 +45,13 @@ void get_forks(int i){
     while(state[i] != EATING){
         pthread_cond_wait(&cond[i], &mutex);
     }
-
+    printf("Agarrando cubiertos desde el hilo: %i\n", i);
     pthread_mutex_unlock(&mutex);
 }
 
 void put_forks(int i){
-
+    
+    printf("Dejando cubiertos desde el hilo: %i\n", i);
     pthread_mutex_lock(&mutex);
 
     state[i] = THINKING;
@@ -62,16 +63,18 @@ void put_forks(int i){
 }
 
 void think(int i){
+    printf("Pensando desde el hilo: %i\n", i);
     sleep(1);
 }
 
 void eat(int i){
+    printf("comiendo desde el hilo: %i\n", i);
     sleep(2);
 }
 
 void* philosopher(void* num){
 
-    int i = (int)num;
+    int i = *(int*)num;
 
     while(1){
         think(i);
