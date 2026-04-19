@@ -1,11 +1,11 @@
 #include "pasajero.h"
 
 
-void pasajero_init(Pasajero* this, int numeroPasajero, int numFila, bool ejecutivo, double tiempoAbordaje) {
-    this->numeroPasajero = numeroPasajero;
-    this->numFila = numFila;
-    this->ejecutivo = ejecutivo;
-    this->tiempoAbordaje = tiempoAbordaje;
+void pasajero_init(Pasajero* self, int numeroPasajero, int numFila, bool ejecutivo, double tiempoAbordaje) {
+    self->numeroPasajero = numeroPasajero;
+    self->numFila = numFila;
+    self->ejecutivo = ejecutivo;
+    self->tiempoAbordaje = tiempoAbordaje;
 }
 
 void pasajero_print(const Pasajero* this) {

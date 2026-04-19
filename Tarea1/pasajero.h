@@ -10,7 +10,7 @@ typedef struct {
     double tiempoAbordaje;
 } Pasajero;
 
-void pasajero_init(Pasajero* this, int numeroPasajero, int numFila, bool ejecutivo, double tiempoAbordaje);
-void pasajero_print(const Pasajero* this);
+void pasajero_init(Pasajero* self, int numeroPasajero, int numFila, bool ejecutivo, double tiempoAbordaje);
+void pasajero_print(const Pasajero* self);
 
 #endif /* PASAJERO_H */

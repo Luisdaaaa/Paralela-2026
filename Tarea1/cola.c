@@ -1,11 +1,10 @@
 #include "cola.h"
 #include <stdlib.h>
 
-void cola_init(Cola* self, bool ejecutiva) {
+void cola_init(Cola* self) {
     self->cabeza = NULL;
     self->cola = NULL;
     self->tamaño = 0;
-    self->ejecutiva = ejecutiva;
 }
 
 bool cola_vacia(const Cola* self) {
@@ -35,33 +34,38 @@ bool push(Cola* self, Pasajero pasajero){
     return true;
 }
 
-Pasajero pop (Cola* self){
-
+bool pop (Cola* self){
     if (cola_vacia(self)){
-        Pasajero invalido = {0, 0, 0};
-        return invalido;
-    }
-
-    // 1. Guardamos una referencia al nodo que vamos a eliminar
-    Nodo* nodo_a_eliminar = self->cabeza;
-    
-    // 2. Extraemos el pasajero del nodo ANTES de liberarlo
-    Pasajero pasajero_a_devolver = nodo_a_eliminar->pasajero;
-
-    // 3. Ajustamos los punteros de la cola
-    if(self->tamaño == 1){
-        self->cabeza = NULL;
-        self->cola = NULL;
+        return false;
     }
     else{
-        self->cabeza = self->cabeza->siguiente;
-        self->cabeza->anterior = NULL;
+        if(self->tamaño==1){
+            free(self->cabeza);
+            self->cabeza=NULL;
+            self->cola=NULL;
+        }
+        else{
+            Nodo* nodo_a_eliminar=self->cabeza;
+        self->cabeza=self->cabeza->siguiente;
+        self->cabeza->anterior=NULL;
+        free(nodo_a_eliminar);
+        }
     }
-
-    // 4. Liberamos la memoria del nodo y reducimos el tamaño
-    free(nodo_a_eliminar);
     self->tamaño--;
+    return true;
+}
 
-    // 5. Devolvemos el pasajero que habíamos guardado
-    return pasajero_a_devolver;
+Pasajero* frente(const Cola* self){
+    if (cola_vacia(self)){
+        return NULL;
+    }
+    return &(self->cabeza->pasajero);
+}
+
+bool balancear(Cola* self, int limite){
+    //Por hacer, en duda
+}
+
+bool adelantar (Cola* self, bool ejecutivo){
+    //Por hacer, en duda
 }

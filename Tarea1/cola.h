@@ -9,17 +9,23 @@ typedef struct Nodo {
 } Nodo;
 
 typedef struct {
-    Nodo* cabeza=NULL;
-    Nodo* cola=NULL;
+    Nodo* cabeza;
+    Nodo* cola;
     int tamaño;
 } Cola;
 
-bool cola_vacia(const Cola* this );
+void cola_init(Cola* self);// Inicializa la cola
 
-bool push(Cola* this, Pasajero pasajero);
+bool cola_vacia(const Cola* self );// Verifica si la cola está vacía
 
-Pasajero pop(Cola* this);
+bool push(Cola* self, Pasajero pasajero);// Agrega un pasajero a la cola
 
-bool 
+bool pop(Cola* self);// Elimina y libera el primer pasajero de la cola
+
+Pasajero* frente(const Cola* self);// Devuelve un puntero al primer pasajero de la cola sin eliminarlo
+
+bool balancear(Cola* self, int limite);// Balancea la cola para mantener un número máximo de pasajeros ejecutivos
+
+bool adelantar (Cola* self, bool ejecutivo);// Adelanta un pasajero en la cola
 
 #endif
