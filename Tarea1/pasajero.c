@@ -1,14 +1,24 @@
 #include "pasajero.h"
 
 
-void pasajero_init(Pasajero* self, int numeroPasajero, int numFila, bool ejecutivo, double tiempoAbordaje) {
-    self->numeroPasajero = numeroPasajero;
-    self->numFila = numFila;
-    self->ejecutivo = ejecutivo;
-    self->tiempoAbordaje = tiempoAbordaje;
+void pasajero_init(Pasajero* this, int numeroPasajero, int numFila, int tipoPasajero, double tiempoAbordaje) {
+    this->numeroPasajero = numeroPasajero;
+    this->numFila = numFila;
+    this->tipoPasajero = tipoPasajero;
+    this->tiempoAbordaje = tiempoAbordaje;
 }
 
 void pasajero_print(const Pasajero* this) {
-    printf("Pasajero %d: Fila %d, Ejecutivo: %s, Tiempo de abordaje: %.2f\n",
-        this->numeroPasajero, this->numFila, this->ejecutivo ? "Ejecutivo" : "Economy", this->tiempoAbordaje);
+    char* strTipoPasajero;
+    if (this->tipoPasajero == 0) {
+        strTipoPasajero = "Economy";
+    } else if (this->tipoPasajero == 1) {
+        strTipoPasajero = "Ejecutivo";
+    } else if (this->tipoPasajero == 2) {
+        strTipoPasajero = "Internacional";
+    } else {
+        strTipoPasajero = "Desconocido";
+    }
+    printf("Pasajero %d: Fila %d, Tipo: %s, Tiempo de abordaje: %.2f\n",
+        this->numeroPasajero, this->numFila, strTipoPasajero, this->tiempoAbordaje);
 }

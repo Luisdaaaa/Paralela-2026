@@ -6,11 +6,11 @@
 typedef struct {
     int numeroPasajero;
     int numFila;
-    bool ejecutivo;
+    int tipoPasajero; // 0 para economy, 1 para ejecutivo. 2 para internacional
     double tiempoAbordaje;
 } Pasajero;
 
-void pasajero_init(Pasajero* self, int numeroPasajero, int numFila, bool ejecutivo, double tiempoAbordaje);
-void pasajero_print(const Pasajero* self);
+void pasajero_init(Pasajero* this, int numeroPasajero, int numFila, bool ejecutivo, double tiempoAbordaje);
+void pasajero_print(const Pasajero* this);
 
 #endif /* PASAJERO_H */
