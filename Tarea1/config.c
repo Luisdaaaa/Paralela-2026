@@ -22,43 +22,20 @@ if (num_procesadores < 5) {
     ArgumentosHilo args; 
     int resultado;
     num_procesadores-=2; // Reservamos 2 procesadores para el balanceo y adelantar
+    num_procesadores/=3; // Dividimos entre 3 para obtener el número máximo de counters por fila, ya que cada fila tiene la misma cantidad de hilos atendiendo
 
-    printf("Número de procesadores disponibles: %d\n", num_procesadores); 
+    printf("Número de procesadores disponibles para cada fila: %d\n", num_procesadores); 
     printf("Ingrese un numero de personas: \n");
     scanf("%d", &resultado);
     d->N_pasajeros = resultado;
 
-
-    printf("Ingrese un numero de filas para bussines: \n");
+    printf("Ingrese un numero de counters por fila: \n");
     scanf("%d", &resultado);
-    while (resultado > num_procesadores-2|| resultado < 1) { // Reservamos 2 procesadores para las otras filas, 1 para economy, 1 para internacionales
-        printf("El número de filas para bussines no puede ser mayor que el número de procesadores disponibles, abarcar todas las filas o ser menor que 1. Ingrese un número válido: \n");
+    while(resultado > num_procesadores) { // Como son 3 filas con la misma cantidad de hilos atendiendo, se divide entre 3 el número de procesadores disponibles para obtener el máximo número de counters por fila
+        printf("El número de counters por fila no puede ser mayor que el número de procesadores disponibles. Ingrese un número válido: \n");
         scanf("%d", &resultado);
     }
-    d->M_filas_bussines = resultado;
-    num_procesadores -= d->M_filas_bussines; // Restamos los procesadores usados para bussines
-
-
-    printf("Ingrese un numero de filas para economy: \n");
-    scanf("%d", &resultado);
-        while(resultado > num_procesadores-1 || resultado < 1) { // Reservamos 1 procesador para la fila de internacionales
-        printf("El número de filas para economy no puede ser mayor que el número de procesadores disponibles, abarcar todas las filas o ser menor que 1. Ingrese un número válido: \n");
-        scanf("%d", &resultado);
-    }
-    d->M_filas_economy = resultado;
-    num_procesadores -= d->M_filas_economy; // Restamos los procesadores usados para economy
-
-
-    printf("Ingrese un numero de filas para internacionales: \n");
-    scanf("%d", &resultado);
-        while(resultado > num_procesadores || resultado < 1) { // No podemos reservar más procesadores de los disponibles
-            printf("El número de filas para internacionales no puede ser mayor que el número de procesadores disponibles, abarcar todas las filas o ser menor que 1. Ingrese un número válido: \n");
-            scanf("%d", &resultado);
-        }
-    d->M_filas_internacionales = resultado;
-    num_procesadores -= d->M_filas_internacionales; // Restamos los procesadores usados para internacionales
-
-    d->M_filas_total = d->M_filas_bussines + d->M_filas_economy + d->M_filas_internacionales;// Calculamos el total de filas
+    d->M_counters_por_fila = resultado;
 
 
     printf("Ingrese un numero maximo de personas por fila: \n");
@@ -80,11 +57,31 @@ if (num_procesadores < 5) {
     d->T_tiempo_abordaje_max_ejecutiva = resultado;
 
     args.info_compartida = d; // Asignamos la dirección de la estructura de datos al campo info_compartida de ArgumentosHilo
-    d->colas_filas = (Cola*)malloc(d->M_filas_total * sizeof(Cola)); // Reservamos memoria para el array de colas
-    for (int i = 0; i < d->M_filas_total; i++)   
+    d->colas_filas = (Cola*)malloc(3 * sizeof(Cola)); // Reservamos memoria para el array de colas
+    for (int i = 0; i < 3; i++)   
         {
-            cola_init(&d->colas_filas[i]); // Inicializamos cada cola, implicitamente los indices ya recopilados indican a que tipo de fila corresponde, por ejemplo, las primeras M_filas_bussines son para bussines, las siguientes M_filas_economy para economy y las últimas M_filas_internacionales para internacionales
+            cola_init(&d->colas_filas[i]); 
 
         }
     return args;
+}
+
+bool llenar_colas(ArgumentosHilo args) {
+    for(int i = 0; i < args.info_compartida->N_pasajeros; i++) {
+        Pasajero p;
+        int tipoPasajero = rand() % 100; // Genera un número aleatorio entre 0 y 2 para determinar el tipo de pasajero
+        if(tipoPasajero<70){
+            pasajero_init(&p, i, args.info_compartida->colas_filas[0].tamaño, 0, 0.0); // Asigna el número de pasajero, la fila (i % 3 para distribuirlos en las 3 filas), el tipo de pasajero y el tiempo de abordaje
+            push(&args.info_compartida->colas_filas[0], p);
+        }
+        else if(tipoPasajero>=70&&tipoPasajero<=90){
+            pasajero_init(&p, i, args.info_compartida->colas_filas[1].tamaño, 1, 0.0); // Asigna el número de pasajero, la fila (i % 3 para distribuirlos en las 3 filas), el tipo de pasajero y el tiempo de abordaje
+            push(&args.info_compartida->colas_filas[1], p);
+        }
+        else if(tipoPasajero>90){
+            pasajero_init(&p, i, args.info_compartida->colas_filas[2].tamaño, 2, 0.0); // Asigna el número de pasajero, la fila (i % 3 para distribuirlos en las 3 filas), el tipo de pasajero y el tiempo de abordaje
+            push(&args.info_compartida->colas_filas[2], p);
+        }
+    }
+    return true; 
 }
