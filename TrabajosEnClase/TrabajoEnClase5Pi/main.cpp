@@ -11,7 +11,6 @@ int main() {
 
     omp_set_num_threads(8); // Establece el número de hilos a usar en la región paralela
 
-    printf("Número de hilos: %d\n", omp_get_num_threads()); // Imprime el número de hilos que se usarán en la región paralela
     int i;
     // x: punto de evaluación, pi: valor aproximado de pi, sum: acumulador de la sumatoria
     double x, pi, sum = 0.0;
@@ -23,8 +22,8 @@ int main() {
     double tdata = omp_get_wtime();
     
     // Loop que itera sobre cada subintervalo
+    # pragma omp parallel for reduction (+: sum )
     for (i = 0; i < num_steps; i++) {
-        #pragma omp parallel
         // Calcula el punto medio del i-ésimo subintervalo
         x = (i + 0.5) * step;
 

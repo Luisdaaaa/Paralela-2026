@@ -6,7 +6,7 @@
 typedef struct {
     int numeroPasajero;
     int numFila;
-    bool ejecutivo;
+    int tipoPasajero; // 0 para economy, 1 para ejecutivo. 2 para internacional
     double tiempoAbordaje;
 } Pasajero;
 
