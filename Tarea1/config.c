@@ -22,20 +22,40 @@ if (num_procesadores < 5) {
     ArgumentosHilo args; 
     int resultado;
     num_procesadores-=2; // Reservamos 2 procesadores para el balanceo y adelantar
-    num_procesadores/=3; // Dividimos entre 3 para obtener el número máximo de counters por fila, ya que cada fila tiene la misma cantidad de hilos atendiendo
-
-    printf("Número de procesadores disponibles para cada fila: %d\n", num_procesadores); 
+    printf("Número de procesadores disponibles para repartir entre todos los counters: %d\n", num_procesadores); 
     printf("Ingrese un numero de personas: \n");
     scanf("%d", &resultado);
     d->N_pasajeros = resultado;
 
-    printf("Ingrese un numero de counters por fila: \n");
+     printf("Ingrese un numero counters para bussines: \n");
     scanf("%d", &resultado);
-    while(resultado > num_procesadores) { // Como son 3 filas con la misma cantidad de hilos atendiendo, se divide entre 3 el número de procesadores disponibles para obtener el máximo número de counters por fila
-        printf("El número de counters por fila no puede ser mayor que el número de procesadores disponibles. Ingrese un número válido: \n");
+    while (resultado > num_procesadores-2|| resultado < 1) { // Reservamos 2 procesadores para las otras filas, 1 para economy, 1 para internacionales
+        printf("El número de filas para bussines no puede ser mayor que el número de procesadores disponibles, abarcar todas las filas o ser menor que 1. Ingrese un número válido: \n");
         scanf("%d", &resultado);
     }
-    d->M_counters_por_fila = resultado;
+    d->M_counters_bussines = resultado;
+    num_procesadores -= d->M_counters_bussines; // Restamos los procesadores usados para bussines
+
+
+    printf("Ingrese un numero de counters para economy: \n");
+    scanf("%d", &resultado);
+        while(resultado > num_procesadores-1 || resultado < 1) { // Reservamos 1 procesador para la fila de internacionales
+        printf("El número de filas para economy no puede ser mayor que el número de procesadores disponibles, abarcar todas las filas o ser menor que 1. Ingrese un número válido: \n");
+        scanf("%d", &resultado);
+    }
+    d->M_counters_economy = resultado;
+    num_procesadores -= d->M_counters_economy; // Restamos los procesadores usados para economy
+
+
+    printf("Ingrese un numero de counters para internacionales: \n");
+    scanf("%d", &resultado);
+        while(resultado > num_procesadores || resultado < 1) { // No podemos reservar más procesadores de los disponibles
+            printf("El número de filas para internacionales no puede ser mayor que el número de procesadores disponibles, abarcar todas las filas o ser menor que 1. Ingrese un número válido: \n");
+            scanf("%d", &resultado);
+        }
+    d->M_counters_internacionales = resultado;
+    num_procesadores -= d->M_counters_internacionales; // Restamos los procesadores usados para internacionales
+    d->M_counters_total = d->M_counters_bussines + d->M_counters_economy + d->M_counters_internacionales; // Calculamos el total de counters usados
 
 
     printf("Ingrese un numero maximo de personas por fila: \n");
@@ -56,6 +76,11 @@ if (num_procesadores < 5) {
     scanf("%d", &resultado);
     d->T_tiempo_abordaje_max_ejecutiva = resultado;
 
+    d->tiempo_hilos = (time_t*)malloc(d->M_counters_total * sizeof(time_t)); // Reservamos memoria para el array de tiempos
+    for(int i = 0; i < d->M_counters_total; i++) {
+        d->tiempo_hilos[i] = 0; // Inicializamos los tiempos en 0
+    }
+
     args.info_compartida = d; // Asignamos la dirección de la estructura de datos al campo info_compartida de ArgumentosHilo
     d->colas_filas = (Cola*)malloc(3 * sizeof(Cola)); // Reservamos memoria para el array de colas
     for (int i = 0; i < 3; i++)   
@@ -63,6 +88,15 @@ if (num_procesadores < 5) {
             cola_init(&d->colas_filas[i]); 
 
         }
+    
+    for(int i = 0; i < 3; i++) {
+        pthread_mutex_init(&d->mutex[i], NULL); // Inicializamos los mutex para cada fila
+    }
+    
+    d->cond = (pthread_cond_t*)malloc(d->M_counters_total * sizeof(pthread_cond_t));
+    for(int i =0; i<d->M_counters_total; i++) {
+        pthread_cond_init(&d->cond[i], NULL); // Inicializamos las condiciones para cada hilo
+    }
     return args;
 }
 

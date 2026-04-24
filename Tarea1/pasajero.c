@@ -14,10 +14,8 @@ void pasajero_print(const Pasajero* this) {
         strTipoPasajero = "Economy";
     } else if (this->tipoPasajero == 1) {
         strTipoPasajero = "Ejecutivo";
-    } else if (this->tipoPasajero == 2) {
-        strTipoPasajero = "Internacional";
     } else {
-        strTipoPasajero = "Desconocido";
+        strTipoPasajero = "Internacional";
     }
     printf("Pasajero %d: Fila %d, Tipo: %s, Tiempo de abordaje: %.2f\n",
         this->numeroPasajero, this->numFila, strTipoPasajero, this->tiempoAbordaje);
