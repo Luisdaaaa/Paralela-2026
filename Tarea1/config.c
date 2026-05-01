@@ -67,10 +67,13 @@ if (num_procesadores < 5) {
     d->Q_maximo_por_fila = resultado;
 
 
-    printf("Ingrese un numero de personas para dormir la fila: \n");
+    printf("Ingrese un numero de tiempo para dormir la fila minimo: \n");
     scanf("%d", &resultado);
     //Preguntar al profesor como se calcula esto, si es un número fijo o un porcentaje del total de pasajeros
-    d->K_pasajeros_para_dormir_filal = resultado;
+    d->K_min = resultado;
+    printf("Ingrese un numero de tiempo para dormir la fila maximo: \n");
+    scanf("%d", &resultado);
+    d->k_max = resultado;
 
     printf("Ingrese un numero de tiempo maximo en mili de abordaje para ejecutiva: \n");
     scanf("%d", &resultado);
@@ -79,6 +82,11 @@ if (num_procesadores < 5) {
     d->tiempo_hilos = (time_t*)malloc(d->M_counters_total * sizeof(time_t)); // Reservamos memoria para el array de tiempos
     for(int i = 0; i < d->M_counters_total; i++) {
         d->tiempo_hilos[i] = 0; // Inicializamos los tiempos en 0
+    }
+
+    d->hilos_dormidos = (bool*)malloc(d->M_counters_total * sizeof(bool)); // Reservamos memoria para el array de booleanos
+    for(int i = 0; i < d->M_counters_total; i++) {
+        d->hilos_dormidos[i] = false; // Inicializamos los booleanos en false, indicando que ningún hilo está dormido al inicio
     }
 
     args.info_compartida = d; // Asignamos la dirección de la estructura de datos al campo info_compartida de ArgumentosHilo

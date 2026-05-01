@@ -47,16 +47,29 @@ void* atender_pasajeros(void* arg) {
     ArgumentosHilo* args = (ArgumentosHilo*)arg;
     int mi_indice = args->mi_indice;
     datos* info = args->info_compartida;
+    info->tiempo_hilos[mi_indice] = time(NULL); // empezamos a contar el tiempo desde que el hilo inicia su trabajo, para decidir si el hilo se duerme o no
     // Business
     if (mi_indice < info->M_counters_bussines) {
         while (true) {
-            pthread_mutex_lock(&info->mutex[1]);
-            
-            // Preguntar si el hilo debe dormir por orden del hilo control
-            while(info->tiempo_hilos[mi_indice] == -1){
-                pthread_cond_wait(&info->cond[mi_indice], &info->mutex[1]);
-            }
+            time_t tiempo_abordaje = time(NULL); //calcula el tiempo de abordaje para el pasajero actual, para decidir si se adelanta a los business o no
 
+            pthread_mutex_lock(&info->mutex[1]);
+
+            time_t tiempo_del_hilo = time(NULL) - info->tiempo_hilos[mi_indice]; // Calculamos el tiempo que ha pasado desde que el hilo empezó a atender pasajeros
+            
+            if(tiempo_del_hilo >= info->K_min){
+
+                int valor_para_dormir = rand() % (info->k_max - info->K_min + 1) + info->K_min;
+
+                if(tiempo_del_hilo <= valor_para_dormir||tiempo_del_hilo >= info->k_max){
+                    info->hilos_dormidos[mi_indice] = true; // Marcamos el hilo como dormido
+                }
+
+                while(info->hilos_dormidos[mi_indice]){ // si el tiempo del hilo es menor o igual al numero aleatorio en el rango, el hilo se duerme
+                pthread_cond_wait(&info->cond[mi_indice], &info->mutex[1]);
+                }
+            }
+            
             // Si ya no hay pasajeros, terminamos el hilo
             if (info->colas_filas[1].tamaño <= 0) {
                 pthread_mutex_unlock(&info->mutex[1]);
@@ -65,22 +78,39 @@ void* atender_pasajeros(void* arg) {
 
             // Atender pasajero
             Pasajero* p = frente(&info->colas_filas[1]);
+            time_t tiempo_atencion = time(NULL) - tiempo_abordaje; // Calculamos el tiempo que tardó en atender al pasajero
             if (p) {
+                p->tiempoAbordaje = tiempo_atencion; // Asignamos el tiempo de abordaje al pasajero
+                strcpy(p->filaPerteneciente, "Ejecutivo");
                 pasajero_print(p); // Imprimir información del pasajero atendido
                 pop(&info->colas_filas[1]);
             }
             
-            pthread_mutex_unlock(&info->mutex[1]);
-            sleep(1); // Simular tiempo de atención al pasajero
+            if (tiempo_atencion > info->T_tiempo_abordaje_max_ejecutiva) {// Si el tiempo de atención supera el tiempo máximo permitido para ejecutiva, se adelanta a international
+                pthread_mutex_lock(&info->mutex[2]); // Bloqueamos el mutex de la fila de internacionales
+                printf("Se adelanta los pasajeros de ejecutiva a internacionales por tiempo de atención!\n");
+                pthread_mutex_unlock(&info->mutex[2]);
+            }
 
+            pthread_mutex_unlock(&info->mutex[1]);
         }
-    } else if (mi_indice <= info->M_counters_bussines + info->M_counters_economy) { // Si el indice es menor a la suma de M_counters_bussines y M_counters_economy, atiende a la fila de economy
+    } else if (mi_indice < info->M_counters_bussines + info->M_counters_economy) { // Si el indice es menor a la suma de M_counters_bussines y M_counters_economy, atiende a la fila de economy
         while (true) {
             pthread_mutex_lock(&info->mutex[0]); // Bloqueamos el mutex de la fila de economy
             
-            // Preguntar si el hilo debe dormir por orden del hilo control
-            while(info->tiempo_hilos[mi_indice] == -1){
-                pthread_cond_wait(&info->cond[mi_indice], &info->mutex[1]);
+            time_t tiempo_del_hilo = time(NULL) - info->tiempo_hilos[mi_indice]; // Calculamos el tiempo que ha pasado desde que el hilo empezó a atender pasajeros
+            
+            if(tiempo_del_hilo >= info->K_min){
+
+                int valor_para_dormir = rand() % (info->k_max - info->K_min + 1) + info->K_min;
+
+                if(tiempo_del_hilo <= valor_para_dormir||tiempo_del_hilo >= info->k_max){
+                    info->hilos_dormidos[mi_indice] = true; // Marcamos el hilo como dormido
+                }
+
+                while(info->hilos_dormidos[mi_indice]){ // si el tiempo del hilo es menor o igual al numero aleatorio en el rango, el hilo se duerme
+                pthread_cond_wait(&info->cond[mi_indice], &info->mutex[0]);
+                }
             }
 
             // Si ya no hay pasajeros, terminamos el hilo
@@ -92,20 +122,30 @@ void* atender_pasajeros(void* arg) {
             // Atender pasajero
             Pasajero* p = frente(&info->colas_filas[0]);
             if (p) {
+                strcpy(p->filaPerteneciente, "Economy");
                 pasajero_print(p); // Imprimir información del pasajero atendido
                 pop(&info->colas_filas[0]);
             }
             
             pthread_mutex_unlock(&info->mutex[0]);
-            sleep(1); // Simular tiempo de atención al pasajero
         }
     }else{
         while (true) {
             pthread_mutex_lock(&info->mutex[2]); // Bloqueamos el mutex de la fila de internacionales
             
-            // Preguntar si el hilo debe dormir por orden del hilo control
-            while(info->tiempo_hilos[mi_indice] == -1){
+            time_t tiempo_del_hilo = time(NULL) - info->tiempo_hilos[mi_indice]; // Calculamos el tiempo que ha pasado desde que el hilo empezó a atender pasajeros
+            
+            if(tiempo_del_hilo >= info->K_min){
+
+                int valor_para_dormir = rand() % (info->k_max - info->K_min + 1) + info->K_min;
+
+                if(tiempo_del_hilo <= valor_para_dormir||tiempo_del_hilo >= info->k_max){
+                    info->hilos_dormidos[mi_indice] = true; // Marcamos el hilo como dormido
+                }
+
+                while(info->hilos_dormidos[mi_indice]){ // si el tiempo del hilo es menor o igual al numero aleatorio en el rango, el hilo se duerme
                 pthread_cond_wait(&info->cond[mi_indice], &info->mutex[2]);
+                }
             }
 
             // Si ya no hay pasajeros, terminamos el hilo
@@ -117,14 +157,21 @@ void* atender_pasajeros(void* arg) {
             // Atender pasajero
             Pasajero* p = frente(&info->colas_filas[2]);
             if (p) {
+                strcpy(p->filaPerteneciente, "Internacional");
                 pasajero_print(p); // Imprimir información del pasajero atendido
                 pop(&info->colas_filas[2]);
             }
             
             pthread_mutex_unlock(&info->mutex[2]);
-            sleep(1); // Simular tiempo de atención al pasajero
-
         }
+    }
+    return NULL;
+}
+
+void* hiloSupervisor(void* arg) {
+
+    while(1) {
+
     }
     return NULL;
 }

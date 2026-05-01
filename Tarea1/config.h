@@ -22,12 +22,14 @@ typedef struct {
     int M_counters_internacionales;
     int M_counters_total;
     int Q_maximo_por_fila;
-    int K_pasajeros_para_dormir_filal;
+    int K_min;
+    int k_max;
     int T_tiempo_abordaje_max_ejecutiva;
     Cola* colas_filas;      // Puntero al array de colas para cada fila
     time_t* tiempo_hilos;   // Puntero al array de tiempos para cada hilo
     pthread_mutex_t mutex[3];   // Mutex para proteger el acceso a los tiempos
     pthread_cond_t* cond;     // Condiciones para cada fila, para despertar a los hilos cuando se cumplan las condiciones de dormirse o despertar
+    bool* hilos_dormidos; // Array de booleanos para saber si un hilo está dormido o no
 } datos;
 
 typedef struct {
