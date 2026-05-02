@@ -22,14 +22,21 @@ typedef struct {
     int M_counters_internacionales;
     int M_counters_total;
     int Q_maximo_por_fila;
-    int K_min;
-    int k_max;
-    int T_tiempo_abordaje_max_ejecutiva;
+    long long K_min;
+    long long k_max;
+    long long T_tiempo_abordaje_max_ejecutiva;
+    long long* tiempo_hilos;   // Puntero al array de tiempos para cada hilo
     Cola* colas_filas;      // Puntero al array de colas para cada fila
-    time_t* tiempo_hilos;   // Puntero al array de tiempos para cada hilo
     pthread_mutex_t mutex[3];   // Mutex para proteger el acceso a los tiempos
+    pthread_mutex_t mutex_supervisor; // Mutex para proteger el acceso a la condición del supervisor
+    pthread_mutex_t mutexBalanceador; // Mutex para proteger el acceso a la condición del balanceador
     pthread_cond_t* cond;     // Condiciones para cada fila, para despertar a los hilos cuando se cumplan las condiciones de dormirse o despertar
+    pthread_cond_t cond_supervisor;
+    pthread_cond_t cond_balanceador;
     bool* hilos_dormidos; // Array de booleanos para saber si un hilo está dormido o no
+    bool programa_terminado; // Variable para indicar al supervisor que el programa ha terminado y ya no es necesario que despierte a los hilos
+    int tareaBalanceador; //tipo de tarea que realiza el balanceador, 0 para balancear por cantidad de pasajeros en cada fila, 1 para balancear por tiempo de atención de cada fila
+    bool llamado_a_balanceador; // Variable para saber si el hilo ha llamado al balanceador por tiempo de atención
 } datos;
 
 typedef struct {

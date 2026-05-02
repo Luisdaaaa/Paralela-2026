@@ -61,13 +61,3 @@ Pasajero* frente(const Cola* self){
     }
     return &(self->cabeza->pasajero);
 }
-
-bool balancear(Cola* self, int limite){
-    //Por hacer, en duda
-    return true;
-}
-
-bool adelantar (Cola* self, bool ejecutivo){
-    //Por hacer, en duda
-    return true;
-}
