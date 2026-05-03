@@ -34,6 +34,7 @@ bool push(Cola* self, Pasajero pasajero){
     return true;
 }
 
+
 bool pop (Cola* self){
     if (cola_vacia(self)){
         return false;
@@ -60,4 +61,47 @@ Pasajero* frente(const Cola* self){
         return NULL;
     }
     return &(self->cabeza->pasajero);
+}
+
+bool adelantar_pasajero(Cola* self, Cola* destino) {
+    if (cola_vacia(self) || destino == NULL || self == destino) {
+        return false; // No hay pasajeros o parámetros inválidos
+    }
+
+    Nodo* nodo_a_adelantar = self->cabeza; // Tomamos el primer nodo de la cola original
+    Nodo* cabezaOriginal = self->cabeza; // Guardamos la nueva cabeza de la cola original, que será la nueva cabeza después de adelantar
+    int movidos = 1;
+
+    for(int i = 0; i <30; i++) {
+        
+        if (nodo_a_adelantar == NULL) {
+            return false; // No hay más pasajeros para revisar
+        }
+        if (nodo_a_adelantar->siguiente == NULL) {
+            break; // Hemos llegado al final de la cola 
+        }
+        movidos++;
+
+        nodo_a_adelantar = nodo_a_adelantar->siguiente; // Avanzamos al siguiente nodo
+
+    }
+    if(nodo_a_adelantar->siguiente != NULL) {
+        self->cabeza = nodo_a_adelantar->siguiente; // La nueva cabeza de la cola original será el nodo siguiente al nodo a adelantar
+        self->cabeza->anterior = NULL; // El nodo anterior del primer nodo de la cola original ahora es NULL
+        nodo_a_adelantar->siguiente = NULL; // El nodo a adelantar siguiente ahora es NULL, para disvincularlo de la cola original
+    } else {
+        self->cola= NULL; // Si el nodo a adelantar es el último nodo, entonces la cola original quedará vacía
+        self->cabeza = NULL; // La cabeza de la cola original también se establece en NULL
+    }
+    if (destino->cabeza != NULL) {
+        nodo_a_adelantar->siguiente = destino->cabeza; // El nodo siguiente del nodo a adelantar ahora es el siguiente al nodo adelantar
+        destino->cabeza->anterior = nodo_a_adelantar; // El nodo anterior del primer nodo de la cola destino ahora es el nodo a adelantar
+        destino->cabeza = cabezaOriginal;
+    } else {
+        destino->cabeza = cabezaOriginal; // Si la cola destino está vacía, la cabeza de la cola original se convierte en la cabeza de la cola destino
+        destino->cola = nodo_a_adelantar; // El nodo a adelantar se convierte en la cola de la cola destino
+    }
+    destino->tamaño += movidos; // Incrementamos el tamaño de la cola destino
+    self->tamaño -= movidos; // Decrementamos el tamaño de la cola original
+    return true; // Pasajero adelantado exitosamente
 }

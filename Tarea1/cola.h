@@ -23,4 +23,6 @@ bool push(Cola* self, Pasajero pasajero);// Agrega un pasajero a la cola
 bool pop(Cola* self);// Elimina y libera el primer pasajero de la cola
 
 Pasajero* frente(const Cola* self);// Devuelve un puntero al primer pasajero de la cola sin eliminarlo
+
+bool adelantar_pasajero(Cola* self, Cola* destino);
 #endif

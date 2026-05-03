@@ -7,14 +7,17 @@
 #define COLOR_ROJO    "\x1b[31m"
 #define COLOR_VERDE   "\x1b[32m"
 #define COLOR_AMARILLO "\x1b[33m"
+#define COLOR_AZUL    "\x1b[34m"
 
 void* atender_pasajeros(void* arg);
 void* hiloSupervisor(void* arg);
 void* hiloBalanceador(void* arg);
 
 int main() {
-
+    
     ArgumentosHilo args = obtener_datos();
+    struct timespec inicioPrograma, finPrograma;
+    clock_gettime(CLOCK_MONOTONIC, &inicioPrograma); // Medimos el tiempo de inicio del programa
 
     if (args.info_compartida == NULL) return -1;
     pthread_t counters[args.info_compartida->M_counters_total];
@@ -38,6 +41,7 @@ int main() {
     
     
     args.info_compartida->programa_terminado = false; 
+    args.info_compartida->superadoTiempoMaximoEjecutiva = false;
     
     pthread_create(&supervisor, NULL, hiloSupervisor, args.info_compartida);
     pthread_create(&balanceador, NULL, hiloBalanceador, args.info_compartida);
@@ -71,6 +75,10 @@ int main() {
     pthread_cond_destroy(&args.info_compartida->cond_balanceador);
     pthread_join(balanceador, NULL);
 
+    clock_gettime(CLOCK_MONOTONIC, &finPrograma);
+    long long tiempo_total = (finPrograma.tv_sec * 1000LL + finPrograma.tv_nsec / 1000000) - (inicioPrograma.tv_sec * 1000LL + inicioPrograma.tv_nsec / 1000000);
+    printf("Tiempo total del programa: %lld ms\n", tiempo_total);
+
     return 0;
 }
 
@@ -88,7 +96,6 @@ void* atender_pasajeros(void* arg) {
 
     // Business
     if (mi_indice < info->M_counters_bussines) {
-        info->llamado_a_balanceador = false;
         while (true) {
 
             pthread_mutex_lock(&info->mutex[1]);
@@ -129,14 +136,8 @@ void* atender_pasajeros(void* arg) {
                 pop(&info->colas_filas[1]);
             }
             
-            if (tiempo_atencion > info->T_tiempo_abordaje_max_ejecutiva&& !info->llamado_a_balanceador) {// Si el tiempo de atención supera el tiempo máximo permitido para ejecutiva, se adelanta a international
-                pthread_mutex_lock(&info->mutexBalanceador); // Bloqueamos el mutex de la fila de internacionales
-                printf(COLOR_AMARILLO "Se adelanta los pasajeros de ejecutiva a internacionales por tiempo de atención!\n" COLOR_RESET);
-                fflush(stdout);
-                info->tareaBalanceador = 1; // Indicamos al balanceador que debe balancear por tiempo de atención
-                pthread_cond_signal(&info->cond_balanceador); // Despertamos al balanceador 
-                pthread_mutex_unlock(&info->mutexBalanceador);
-                info->llamado_a_balanceador = true; // Indicamos que ya se hizo el llamado al balanceador para que no se vuelva a llamar por el mismo motivo
+            if (tiempo_atencion > info->T_tiempo_abordaje_max_ejecutiva&&info->colas_filas[1].tamaño > 0) {// Si el tiempo de atención supera el tiempo máximo permitido para ejecutiva, se adelanta a international
+                info->superadoTiempoMaximoEjecutiva = true; // Indicamos que se ha superado el tiempo máximo de abordaje para ejecutiva
             }
 
             pthread_mutex_unlock(&info->mutex[1]);
@@ -267,50 +268,38 @@ void* hiloSupervisor(void* arg) {
 void* hiloBalanceador(void* arg) {
     datos* info = (datos*)arg;
     while(info->programa_terminado == false) {
-        pthread_mutex_lock(&info->mutexBalanceador);
-        pthread_cond_wait(&info->cond_balanceador, &info->mutexBalanceador); // El balanceador espera a que lo llammen para hacer una de sus 2 tareas
-        pthread_mutex_unlock(&info->mutexBalanceador);
-        if(info->tareaBalanceador == 0){
-            datos* info = (datos*)arg;
-            
+        struct timespec ts;
+        clock_gettime(CLOCK_REALTIME, &ts);
+        ts.tv_nsec += 350000000;
+
+        if (ts.tv_nsec >= 1000000000) {
+            ts.tv_sec += 1;
+            ts.tv_nsec -= 1000000000;
         }
-        else if(info->tareaBalanceador == 1){//adelantar pasajeros de ejecutiva a internacionales por tiempo de atención
+        pthread_mutex_lock(&info->mutexBalanceador);
+        pthread_cond_timedwait(&info->cond_balanceador, &info->mutexBalanceador, &ts); // El balanceador espera un tiempo para hacer sus 2 tareas
+        pthread_mutex_unlock(&info->mutexBalanceador);
+
+        if(info->superadoTiempoMaximoEjecutiva){// Si se ha superado el tiempo máximo de abordaje para ejecutiva, se adelanta a international 30 personas de esa fila
             pthread_mutex_lock(&info->mutex[1]); // Bloqueamos el mutex de la fila de ejecutiva
             pthread_mutex_lock(&info->mutex[2]); // Bloqueamos el mutex de la fila de internacionales
             
-            Cola* colaTemporal = (Cola*)malloc(sizeof(Cola)); 
-            cola_init(colaTemporal); // OBLIGATORIO: Inicializar la cola para que cabeza y tamaño sean válidos
-
-            while(info->colas_filas[2].tamaño > 0) {
-                Pasajero* pInternational = frente(&info->colas_filas[2]);
-                if (pInternational) {
-                    push(colaTemporal, *pInternational);
-                    pop(&info->colas_filas[2]);
-                }
-            }
-            while(info->colas_filas[1].tamaño > 0) {
-                Pasajero* pEjecutivo = frente(&info->colas_filas[1]);
-                if (pEjecutivo) {
-                    push(&info->colas_filas[2], *pEjecutivo); // Adelantamos al pasajero de ejecutiva a internacionales
-                    pop(&info->colas_filas[1]);
-                }
-            }
-            while(colaTemporal->tamaño > 0) { // Volvemos a poner a los pasajeros internacionales que estaban en la cola temporal de vuelta a la cola de internacionales
-                Pasajero* pInternational = frente(colaTemporal);
-                if (pInternational) {
-                    push(&info->colas_filas[2], *pInternational);
-                    pop(colaTemporal);
-                }
+            adelantar_pasajero(&info->colas_filas[1], &info->colas_filas[2]); // Adelantamos 30 pasajeros de ejecutiva a internacionales
+            printf(COLOR_AMARILLO "Se adelanta los pasajeros de ejecutiva a internacionales por tiempo de atención!\n" COLOR_RESET);
+            fflush(stdout);
+            if(info->colas_filas[1].tamaño == 0) {
+                printf(COLOR_AZUL "La fila de ejecutiva se ha quedado sin pasajeros!\n" COLOR_RESET);
+                fflush(stdout);
+                info->superadoTiempoMaximoEjecutiva = false; // Si la fila de ejecutiva se queda sin pasajeros, ya no es necesario adelantar por tiempo de atención
             }
             
-            free(colaTemporal); 
-            info->tareaBalanceador = -1; 
-
             pthread_mutex_unlock(&info->mutex[2]); 
             pthread_mutex_unlock(&info->mutex[1]); 
-        }  
-    return NULL; 
+        }
+
+
     }
+    return NULL; 
 }
 
 

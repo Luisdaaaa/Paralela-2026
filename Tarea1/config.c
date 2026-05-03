@@ -109,6 +109,7 @@ if (num_procesadores < 5) {
     pthread_mutex_init(&d->mutex_supervisor, NULL); // Inicializamos el mutex para el supervisor
     pthread_mutex_init(&d->mutexBalanceador, NULL); // Inicializamos el mutex para el balanceador
     pthread_cond_init(&d->cond_balanceador, NULL); // Inicializamos la condición para el balanceador
+
     return args;
 }
 

@@ -35,8 +35,7 @@ typedef struct {
     pthread_cond_t cond_balanceador;
     bool* hilos_dormidos; // Array de booleanos para saber si un hilo está dormido o no
     bool programa_terminado; // Variable para indicar al supervisor que el programa ha terminado y ya no es necesario que despierte a los hilos
-    int tareaBalanceador; //tipo de tarea que realiza el balanceador, 0 para balancear por cantidad de pasajeros en cada fila, 1 para balancear por tiempo de atención de cada fila
-    bool llamado_a_balanceador; // Variable para saber si el hilo ha llamado al balanceador por tiempo de atención
+    bool superadoTiempoMaximoEjecutiva; // Variable para indicar al balanceador que se ha superado el tiempo máximo de abordaje para ejecutiva y es necesario adelantar a los pasajeros de esa fila
 } datos;
 
 typedef struct {
