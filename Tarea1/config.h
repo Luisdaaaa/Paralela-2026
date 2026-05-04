@@ -25,6 +25,8 @@ typedef struct {
     long long K_min;
     long long k_max;
     long long T_tiempo_abordaje_max_ejecutiva;
+    long long min_supervisor;
+    long long max_supervisor;
     long long* tiempo_hilos;   // Puntero al array de tiempos para cada hilo
     Cola* colas_filas;      // Puntero al array de colas para cada fila
     pthread_mutex_t mutex[3];   // Mutex para proteger el acceso a los tiempos

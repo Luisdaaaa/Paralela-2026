@@ -75,6 +75,14 @@ if (num_procesadores < 5) {
     scanf("%d", &resultado);
     d->k_max = resultado;
 
+    printf("Ingrese un numero de tiempo minimo en ms para que el supervisor despierte a los hilos: \n");
+    scanf("%d", &resultado);
+    d->min_supervisor = resultado;
+    
+    printf("Ingrese un numero de tiempo maximo en ms para que el supervisor despierte a los hilos: \n");
+    scanf("%d", &resultado);
+    d->max_supervisor = resultado;
+
     printf("Ingrese un numero de tiempo maximo en ms de abordaje para ejecutiva: \n");
     scanf("%d", &resultado);
     d->T_tiempo_abordaje_max_ejecutiva = resultado;
