@@ -1,0 +1,11 @@
+# ninja log v6
+13	524	7995574722288635	CMakeFiles/pract3_Paralela.dir/main.cpp.obj	5fc028e6d7bb38bc
+12	542	7995574098815956	CMakeFiles/pract3_Paralela.dir/AlgStrassen.cpp.obj	53b9a1dba121b6a7
+543	652	7995574104124534	pract3_Paralela.exe	e0999203d9cc01d1
+10	653	7995572792539857	CMakeFiles/pract3_Paralela.dir/Leer.cpp.obj	762de66f643081e8
+9	307	7995575391643816	build.ninja	c1f66361d2637c6b
+6	533	7995582064599138	CMakeFiles/pract3_Paralela.dir/Menu.cpp.obj	25e5e74c04a656ad
+534	642	7995582069878520	pract3_Paralela.exe	356076af24598871
+6	529	7995583545691670	CMakeFiles/pract3_Paralela.dir/main.cpp.obj	5fc028e6d7bb38bc
+5	511	7995584059530439	CMakeFiles/pract3_Paralela.dir/Menu.cpp.obj	25e5e74c04a656ad
+512	624	7995584064599700	pract3_Paralela.exe	356076af24598871
