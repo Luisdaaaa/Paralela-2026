@@ -1,7 +1,8 @@
 #include "pasajero.h"
 
 
-void pasajero_init(Pasajero* this, int numeroPasajero, int numFila, int tipoPasajero, double tiempoAbordaje) {
+
+void pasajero_init(Pasajero* this, int numeroPasajero, int numFila, int tipoPasajero, long long tiempoAbordaje) {
     this->numeroPasajero = numeroPasajero;
     this->numFila = numFila;
     this->tipoPasajero = tipoPasajero;
@@ -17,6 +18,6 @@ void pasajero_print(const Pasajero* this) {
     } else {
         strTipoPasajero = "Internacional";
     }
-    printf("Pasajero %d: Posición: %d, Tipo: %s, Tiempo de abordaje: %.2f\n",
-        this->numeroPasajero, this->numFila, strTipoPasajero, this->tiempoAbordaje);
+    printf("Pasajero %d: Posición: %d, Tipo: %s, Fila: %s, Tiempo de abordaje: %lld\n",
+        this->numeroPasajero, this->numFila, strTipoPasajero, this->filaPerteneciente, this->tiempoAbordaje);
 }
