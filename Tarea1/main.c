@@ -120,7 +120,7 @@ void* atender_pasajeros(void* arg) {
             }
             
             // Si ya no hay pasajeros, terminamos el hilo
-            if (info->colas_filas[1].tamaño <= 0) {
+            if (info->colas_filas[1].tamaño <= 0&& info->colas_filas[0].tamaño <= 0 && info->colas_filas[2].tamaño <= 0) {
                 pthread_mutex_unlock(&info->mutex[1]);
                 break; 
             }
@@ -174,7 +174,7 @@ void* atender_pasajeros(void* arg) {
             }
 
             // Si ya no hay pasajeros, terminamos el hilo
-            if (info->colas_filas[0].tamaño <= 0) {
+            if (info->colas_filas[0].tamaño <= 0&&info->colas_filas[1].tamaño <= 0&&info->colas_filas[2].tamaño <= 0) { // Si ya no hay pasajeros en ninguna fila, el hilo puede terminar
                 pthread_mutex_unlock(&info->mutex[0]);
                 break; 
             }
@@ -224,7 +224,7 @@ void* atender_pasajeros(void* arg) {
             }
 
             // Si ya no hay pasajeros, terminamos el hilo
-            if (info->colas_filas[2].tamaño <= 0) {
+            if (info->colas_filas[2].tamaño <= 0 && info->colas_filas[1].tamaño <= 0 && info->colas_filas[0].tamaño <= 0) {
                 pthread_mutex_unlock(&info->mutex[2]);
                 break; 
             }
@@ -256,7 +256,7 @@ void* atender_pasajeros(void* arg) {
 void* hiloSupervisor(void* arg) {
     datos* info = (datos*)arg;
     while(info->programa_terminado == false) {
-        int tiempo_para_dormir = rand() % (info->max_supervisor - info->min_supervisor + 1) + info->min_supervisor; // el supervisor duerme entre el tiempo elegido
+        int tiempo_para_dormir = rand() % (info->max_supervisor - info->min_supervisor + 1) + info->min_supervisor  ; // el supervisor duerme entre el tiempo elegido
         struct timespec ts;
         clock_gettime(CLOCK_REALTIME, &ts);        
         long long total_nsec = ts.tv_nsec + (tiempo_para_dormir * 1000000LL); 
@@ -292,7 +292,7 @@ void* hiloBalanceador(void* arg) {
     while(info->programa_terminado == false) {
         struct timespec ts;
         clock_gettime(CLOCK_REALTIME, &ts);
-        ts.tv_nsec += 160000000;
+        ts.tv_nsec += 45000000;
 
         if (ts.tv_nsec >= 1000000000) {
             ts.tv_sec += 1;
