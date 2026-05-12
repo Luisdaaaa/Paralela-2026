@@ -1,3 +1,0 @@
-C:/Users/Windows/CLionProjects/pract3_Paralela/cmake-build-debug/CMakeFiles/pract3_Paralela.dir
-C:/Users/Windows/CLionProjects/pract3_Paralela/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/Windows/CLionProjects/pract3_Paralela/cmake-build-debug/CMakeFiles/rebuild_cache.dir
