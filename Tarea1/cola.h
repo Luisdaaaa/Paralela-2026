@@ -24,8 +24,8 @@ bool pop(Cola* self);// Elimina y libera el primer pasajero de la cola
 
 Pasajero* frente(const Cola* self);// Devuelve un puntero al primer pasajero de la cola sin eliminarlo
 
-bool balancear(Cola* self, int limite);// Balancea la cola para mantener un número máximo de pasajeros ejecutivos
+bool adelantar_pasajero(Cola* self, Cola* destino);//adelanta pasajeros a internaiconal por tiempo de atención 
 
-bool adelantar (Cola* self, bool ejecutivo);// Adelanta un pasajero en la cola
+bool balancear(Cola* self, Cola* destino, int cantidad); //balancea pasajeros a internaiconal
 
 #endif

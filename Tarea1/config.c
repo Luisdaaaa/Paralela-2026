@@ -27,7 +27,7 @@ if (num_procesadores < 5) {
     scanf("%d", &resultado);
     d->N_pasajeros = resultado;
 
-     printf("Ingrese un numero counters para bussines: \n");
+    printf("Ingrese un numero counters para bussines: \n");
     scanf("%d", &resultado);
     while (resultado > num_procesadores-2|| resultado < 1) { // Reservamos 2 procesadores para las otras filas, 1 para economy, 1 para internacionales
         printf("El número de filas para bussines no puede ser mayor que el número de procesadores disponibles, abarcar todas las filas o ser menor que 1. Ingrese un número válido: \n");
@@ -67,18 +67,34 @@ if (num_procesadores < 5) {
     d->Q_maximo_por_fila = resultado;
 
 
-    printf("Ingrese un numero de personas para dormir la fila: \n");
+    printf("Ingrese un numero de tiempo para dormir la fila minimo en ms: \n");
     scanf("%d", &resultado);
     //Preguntar al profesor como se calcula esto, si es un número fijo o un porcentaje del total de pasajeros
-    d->K_pasajeros_para_dormir_filal = resultado;
+    d->K_min = resultado;
+    printf("Ingrese un numero de tiempo para dormir la fila maximo en ms: \n");
+    scanf("%d", &resultado);
+    d->k_max = resultado;
 
-    printf("Ingrese un numero de tiempo maximo en mili de abordaje para ejecutiva: \n");
+    printf("Ingrese un numero de tiempo minimo en ms para que el supervisor despierte a los hilos: \n");
+    scanf("%d", &resultado);
+    d->min_supervisor = resultado;
+    
+    printf("Ingrese un numero de tiempo maximo en ms para que el supervisor despierte a los hilos: \n");
+    scanf("%d", &resultado);
+    d->max_supervisor = resultado;
+
+    printf("Ingrese un numero de tiempo maximo en ms de abordaje para ejecutiva: \n");
     scanf("%d", &resultado);
     d->T_tiempo_abordaje_max_ejecutiva = resultado;
 
-    d->tiempo_hilos = (time_t*)malloc(d->M_counters_total * sizeof(time_t)); // Reservamos memoria para el array de tiempos
+    d->tiempo_hilos = (long long*)malloc(d->M_counters_total * sizeof(long long)); // Reservamos memoria para el array de tiempos
     for(int i = 0; i < d->M_counters_total; i++) {
         d->tiempo_hilos[i] = 0; // Inicializamos los tiempos en 0
+    }
+
+    d->hilos_dormidos = (bool*)malloc(d->M_counters_total * sizeof(bool)); // Reservamos memoria para el array de booleanos
+    for(int i = 0; i < d->M_counters_total; i++) {
+        d->hilos_dormidos[i] = false; // Inicializamos los booleanos en false, indicando que ningún hilo está dormido al inicio
     }
 
     args.info_compartida = d; // Asignamos la dirección de la estructura de datos al campo info_compartida de ArgumentosHilo
@@ -97,6 +113,11 @@ if (num_procesadores < 5) {
     for(int i =0; i<d->M_counters_total; i++) {
         pthread_cond_init(&d->cond[i], NULL); // Inicializamos las condiciones para cada hilo
     }
+    pthread_cond_init(&d->cond_supervisor, NULL); // Inicializamos la condición para el supervisor
+    pthread_mutex_init(&d->mutex_supervisor, NULL); // Inicializamos el mutex para el supervisor
+    pthread_mutex_init(&d->mutexBalanceador, NULL); // Inicializamos el mutex para el balanceador
+    pthread_cond_init(&d->cond_balanceador, NULL); // Inicializamos la condición para el balanceador
+
     return args;
 }
 
