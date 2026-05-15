@@ -9,7 +9,6 @@ using namespace std;
 class programa{
     public:
         bool initialize_cube();
-        bool print_cube();
         bool Paraview_data(string filename);
         bool calculate_steps_serial();
         bool calculate_steps_parallel();
@@ -17,5 +16,7 @@ class programa{
     private:
         vector<vector<vector<double>>> cube_old;
         vector<vector<vector<double>>> cube_new;
+        int numArchive=0;
+        int N_TOTAL=N*N*N;
 };
 
