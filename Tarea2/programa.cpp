@@ -1,9 +1,9 @@
 #include "programa.hpp"
 
 bool programa::Paraview_data(string filename) {
-    int N_TOTAL=N*N*N;
     // Implementation for creating Paraview data
-    filename="./ParaviewData/"+filename+".vtk"; // Usar ruta relativa
+    filename="./ParaviewData/"+filename+to_string(numArchive)+".vtk"; // Usar ruta relativa
+    numArchive++;
     std::ofstream paraview_archive(filename);
     if (paraview_archive.is_open()){
         //Header
@@ -47,5 +47,27 @@ bool programa::calculate_steps_parallel() {
 }
 bool programa::initialize_cube() {
     // Implementation for initializing the cube
+    cube_old.resize(N, vector<vector<double>>(N, vector<double>(N, 0.0)));
+    cube_new.resize(N, vector<vector<double>>(N, vector<double>(N, 0.0)));
+    for (int i=0; i<N; i++){
+        for(int j=0; j<N; j++){
+            for(int k=0; k<N; k++){
+                if(k == 0){
+                    cube_old[i][j][k]=0.0; //if its the bottom face, we set the temperature to 0
+                    cube_new[i][j][k]=0.0;
+                }
+                else if(i==0 ||i==N-1 || j==0 || j==N-1 || k==N-1){
+                    cube_old[i][j][k]=100.0; //if we are in the border, we set the temperature to 100
+                    cube_new[i][j][k]=100.0;
+                }
+                else{
+                    cube_old[i][j][k]=(100.0+100.0+100.0+100.0+100.0+0.0)/6.0; //else, we set the temperature to the average of the 6 faces of the cube
+                    cube_new[i][j][k]=0.0;
+
+                }
+            }
+        }
+    }
+    
     return true;
 }
