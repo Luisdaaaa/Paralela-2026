@@ -6,4 +6,6 @@ class menu{
         void display_menu();
     private:
         int option;
+        programa prog;
+    
 };
