@@ -24,6 +24,8 @@ class programa{
         string  filename;
         double tiempo_totalP;
         double tiempo_totalS;
+        double totalP{0.0};
+        double totalS{0.0};
         int n {2};
 };
 

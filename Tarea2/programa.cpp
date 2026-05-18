@@ -52,7 +52,11 @@ bool programa::calculate_steps_parallel() {
         }
         std::swap(cube_old, cube_new);
         if(p%50 == 0){
+            double inicio = omp_get_wtime();
             Paraview_data();
+            double final = omp_get_wtime();
+            double totalTP = final - inicio;
+            totalP += totalTP;
         }
     }
     numArchive = 0;
@@ -78,7 +82,11 @@ bool programa::calculate_steps_serial() {
         
         std::swap(cube_old, cube_new);
         if(p%50 == 0){
+            double inicio = omp_get_wtime();
             Paraview_data();
+            double final = omp_get_wtime();
+            double totalTS = final - inicio;
+            totalS += totalTS;
         }
     }
     numArchive = 0;
@@ -121,8 +129,14 @@ void programa::speedup() {
     calculate_steps_serial();
     initialize_cube();
     calculate_steps_parallel();
-    double speedup = tiempo_totalS  / tiempo_totalP;
-    printf("Speedup:\n  %d hilos\n x %f\n ", n , speedup);
+    double speedup = (tiempo_totalS-totalS)  / (tiempo_totalP-totalP);
+    cout << "Speedup: " << endl <<
+    "x: " << speedup << endl <<
+    "Tiempo Total Serial: " << tiempo_totalS << endl <<
+    "Tiempo Total Serial sin tiempo del archivo: " << tiempo_totalS-totalS << endl <<
+    "Tiempo Total Paralela: " << tiempo_totalP << endl <<
+    "Tiempo Total Paralela sin tiempo del archivo: " << tiempo_totalP-totalP << endl <<
+    "Numero de hilos: " << n << endl;
 }
 void programa::imprimir(){
     /*
