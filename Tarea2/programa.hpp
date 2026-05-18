@@ -1,4 +1,4 @@
-#define N 200
+#define N 100
 #define NUM_STEPS 1000
 #include <iostream>
 #include <fstream>
@@ -26,6 +26,6 @@ class programa{
         double tiempo_totalS;
         double totalP{0.0};
         double totalS{0.0};
-        int n {2};
+        int n {20};
 };
 

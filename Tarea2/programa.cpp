@@ -40,28 +40,30 @@ bool programa::calculate_steps_parallel() {
     omp_set_num_threads(n);
     double tiempo_inicio = omp_get_wtime();
     #pragma omp parallel
-    for(int p = 0; p< NUM_STEPS; p++){
-        #pragma omp for schedule(static) collapse(2) nowait
-        for(int i = 1; i< N-1; i++){
-            for(int j = 1; j< N-1; j++){
-                for(int k = 1; k < N-1; k++){
-                    cube_new[i][j][k] = (cube_old[i+1][j][k] + cube_old[i-1][j][k] +
-                    cube_old[i][j+1][k] + cube_old[i][j-1][k] +
-                    cube_old[i][j][k+1] + cube_old[i][j][k-1]) / 6.0;
+    {
+        for(int p = 0; p< NUM_STEPS; p++){
+            #pragma omp for schedule(static) collapse(2) nowait
+            for(int i = 1; i< N-1; i++){
+                for(int j = 1; j< N-1; j++){
+                    for(int k = 1; k < N-1; k++){
+                        cube_new[i][j][k] = (cube_old[i+1][j][k] + cube_old[i-1][j][k] +
+                        cube_old[i][j+1][k] + cube_old[i][j-1][k] +
+                        cube_old[i][j][k+1] + cube_old[i][j][k-1]) / 6.0;
+                    }
                 }
             }
-        }
-        #pragma omp barrier
-        #pragma omp single
-        {
-            std::swap(cube_old, cube_new);
-            if(p%50 == 0){
-                double inicio = omp_get_wtime();
-                Paraview_data();
-                double final = omp_get_wtime();
-                double totalTP = final - inicio;
-                totalP += totalTP;
-        }
+            #pragma omp barrier
+            #pragma omp single
+            {
+                std::swap(cube_old, cube_new);
+                if(p%50 == 0){
+                    double inicio = omp_get_wtime();
+                    Paraview_data();
+                    double final = omp_get_wtime();
+                    double totalTP = final - inicio;
+                    totalP += totalTP;
+                }
+            }
         }
     }
     numArchive = 0;
@@ -136,7 +138,7 @@ void programa::speedup() {
     calculate_steps_parallel();
     double speedup = (tiempo_totalS-totalS)  / (tiempo_totalP-totalP);
     cout << "Speedup: " << endl <<
-    "x: " << speedup << endl <<
+    "x" << speedup << endl <<
     "Tiempo Total Serial: " << tiempo_totalS << endl <<
     "Tiempo Total Serial sin tiempo del archivo: " << tiempo_totalS-totalS << endl <<
     "Tiempo Total Paralela: " << tiempo_totalP << endl <<

@@ -9,7 +9,7 @@ SRCS = main.cpp menu.cpp programa.cpp
 OBJS = $(SRCS:%.cpp=%.o)
 
 # Nombre del ejecutable final
-TARGET = mi_programa
+TARGET = mi_programa.exe
 
 # 3. Reglas de compilación
 all: $(TARGET)
