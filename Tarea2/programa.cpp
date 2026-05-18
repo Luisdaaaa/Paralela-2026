@@ -37,10 +37,11 @@ bool programa::Paraview_data() {
     return true;
 }
 bool programa::calculate_steps_parallel() {
-    omp_set_num_threads(4);
+    omp_set_num_threads(8); // Set the number of threads to use
     double tiempo_inicio = omp_get_wtime();
+    #pragma omp parallel
     for(int p = 0; p< NUM_STEPS; p++){
-        #pragma omp parallel for
+        #pragma omp for schedule(static) collapse(2) nowait
         for(int i = 1; i< N-1; i++){
             for(int j = 1; j< N-1; j++){
                 for(int k = 1; k < N-1; k++){
@@ -50,9 +51,13 @@ bool programa::calculate_steps_parallel() {
                 }
             }
         }
-        std::swap(cube_old, cube_new);
-        if(p%50 == 0){
-            Paraview_data();
+        #pragma omp barrier
+        #pragma omp single
+        {
+            std::swap(cube_old, cube_new);
+            if(p%50 == 0){
+                Paraview_data();
+            }
         }
     }
     numArchive = 0;

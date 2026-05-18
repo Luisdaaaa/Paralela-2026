@@ -1,4 +1,4 @@
-#define N 300
+#define N 200
 #define NUM_STEPS 1000
 #include <iostream>
 #include <fstream>
