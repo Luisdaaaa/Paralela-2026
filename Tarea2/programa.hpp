@@ -1,4 +1,4 @@
-#define N 300
+#define N 100
 #define NUM_STEPS 1000
 #include <iostream>
 #include <fstream>
@@ -13,6 +13,7 @@ class programa{
         bool Paraview_data();
         bool calculate_steps_serial();
         bool calculate_steps_parallel();
+        void speedup();
         void imprimir();
         //se debe calcular los tiempos para serial y paralelo
     private:
@@ -21,5 +22,8 @@ class programa{
         int numArchive=0;
         int N_TOTAL=N*N*N;
         string  filename;
+        double tiempo_totalP;
+        double tiempo_totalS;
+        int n {2};
 };
 

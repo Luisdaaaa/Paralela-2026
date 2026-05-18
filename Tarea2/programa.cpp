@@ -37,7 +37,7 @@ bool programa::Paraview_data() {
     return true;
 }
 bool programa::calculate_steps_parallel() {
-    omp_set_num_threads(4);
+    omp_set_num_threads(n);
     double tiempo_inicio = omp_get_wtime();
     for(int p = 0; p< NUM_STEPS; p++){
         #pragma omp parallel for
@@ -58,8 +58,8 @@ bool programa::calculate_steps_parallel() {
     numArchive = 0;
     printf("En paralelo\n");
     double tiempo_final = omp_get_wtime();
-    double tiempo_total = tiempo_final - tiempo_inicio;
-    printf("Tiempo de ejecución: %f segundos\n", tiempo_total);
+    tiempo_totalP = tiempo_final - tiempo_inicio;
+    printf("Tiempo de ejecución: %f segundos\n", tiempo_totalP);
     return true;
 }
 
@@ -84,8 +84,8 @@ bool programa::calculate_steps_serial() {
     numArchive = 0;
     printf("En serial\n");
     double tiempo_final = omp_get_wtime();
-    double tiempo_total = tiempo_final - tiempo_inicio;
-    printf("Tiempo de ejecución: %f segundos\n", tiempo_total);
+    tiempo_totalS = tiempo_final - tiempo_inicio;
+    printf("Tiempo de ejecución: %f segundos\n", tiempo_totalS);
     return true;
 }
 
@@ -116,7 +116,14 @@ bool programa::initialize_cube() {
     return true;
 }
 
-
+void programa::speedup() {
+    initialize_cube();
+    calculate_steps_serial();
+    initialize_cube();
+    calculate_steps_parallel();
+    double speedup = tiempo_totalS  / tiempo_totalP;
+    printf("Speedup:\n  %d hilos\n x %f\n ", n , speedup);
+}
 void programa::imprimir(){
     /*
     std::cout << "Cara Frontral" <<std::endl;

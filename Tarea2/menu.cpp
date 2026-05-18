@@ -5,6 +5,7 @@ void menu::display_menu() {
         cout << "Menu del programa:" << endl;
         cout << "1. Calcular serial" << endl;
         cout << "2. Calcular paralelo" << endl;
+        cout << "3. Calcular speedup" << endl;
         cout << "Cualquier otro para salir " << endl;
         cin >> option;
         switch (option){
@@ -15,6 +16,9 @@ void menu::display_menu() {
         case 2:
             prog.initialize_cube();
             prog.calculate_steps_parallel();
+            break;
+        case 3:
+            prog.speedup();
             break;
         default:
             return;
