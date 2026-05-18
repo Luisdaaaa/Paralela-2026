@@ -37,7 +37,7 @@ bool programa::Paraview_data() {
     return true;
 }
 bool programa::calculate_steps_parallel() {
-    omp_set_num_threads(8); // Set the number of threads to use
+    omp_set_num_threads(n);
     double tiempo_inicio = omp_get_wtime();
     #pragma omp parallel
     for(int p = 0; p< NUM_STEPS; p++){
@@ -56,15 +56,19 @@ bool programa::calculate_steps_parallel() {
         {
             std::swap(cube_old, cube_new);
             if(p%50 == 0){
+                double inicio = omp_get_wtime();
                 Paraview_data();
-            }
+                double final = omp_get_wtime();
+                double totalTP = final - inicio;
+                totalP += totalTP;
+        }
         }
     }
     numArchive = 0;
     printf("En paralelo\n");
     double tiempo_final = omp_get_wtime();
-    double tiempo_total = tiempo_final - tiempo_inicio;
-    printf("Tiempo de ejecución: %f segundos\n", tiempo_total);
+    tiempo_totalP = tiempo_final - tiempo_inicio;
+    printf("Tiempo de ejecución: %f segundos\n", tiempo_totalP);
     return true;
 }
 
@@ -83,14 +87,18 @@ bool programa::calculate_steps_serial() {
         
         std::swap(cube_old, cube_new);
         if(p%50 == 0){
+            double inicio = omp_get_wtime();
             Paraview_data();
+            double final = omp_get_wtime();
+            double totalTS = final - inicio;
+            totalS += totalTS;
         }
     }
     numArchive = 0;
     printf("En serial\n");
     double tiempo_final = omp_get_wtime();
-    double tiempo_total = tiempo_final - tiempo_inicio;
-    printf("Tiempo de ejecución: %f segundos\n", tiempo_total);
+    tiempo_totalS = tiempo_final - tiempo_inicio;
+    printf("Tiempo de ejecución: %f segundos\n", tiempo_totalS);
     return true;
 }
 
@@ -121,7 +129,20 @@ bool programa::initialize_cube() {
     return true;
 }
 
-
+void programa::speedup() {
+    initialize_cube();
+    calculate_steps_serial();
+    initialize_cube();
+    calculate_steps_parallel();
+    double speedup = (tiempo_totalS-totalS)  / (tiempo_totalP-totalP);
+    cout << "Speedup: " << endl <<
+    "x: " << speedup << endl <<
+    "Tiempo Total Serial: " << tiempo_totalS << endl <<
+    "Tiempo Total Serial sin tiempo del archivo: " << tiempo_totalS-totalS << endl <<
+    "Tiempo Total Paralela: " << tiempo_totalP << endl <<
+    "Tiempo Total Paralela sin tiempo del archivo: " << tiempo_totalP-totalP << endl <<
+    "Numero de hilos: " << n << endl;
+}
 void programa::imprimir(){
     /*
     std::cout << "Cara Frontral" <<std::endl;
