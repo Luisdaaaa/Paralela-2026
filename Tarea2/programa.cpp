@@ -42,7 +42,7 @@ bool programa::calculate_steps_parallel() {
     #pragma omp parallel
     {
         for(int p = 0; p< NUM_STEPS; p++){
-            #pragma omp for schedule(static) collapse(2) nowait
+            #pragma omp for schedule(static) collapse(2)
             for(int i = 1; i< N-1; i++){
                 for(int j = 1; j< N-1; j++){
                     for(int k = 1; k < N-1; k++){
@@ -52,7 +52,6 @@ bool programa::calculate_steps_parallel() {
                     }
                 }
             }
-            #pragma omp barrier
             #pragma omp single
             {
                 std::swap(cube_old, cube_new);
