@@ -1,0 +1,10 @@
+#include <iostream>
+#include <mpi.h>
+#include <omp.h>
+
+int main(int argc, char** argv) {
+    MPI_Init(&argc, &argv);
+    std::cout << "Hello, World!" << std::endl;
+    MPI_Finalize();
+    return 0;
+}
