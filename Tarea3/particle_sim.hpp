@@ -15,6 +15,6 @@ class ParticleSimulator {
         void initialize_particles();
         bool execute_simulation();
         bool update_Properties();
-        bool merge(vector<Particle>& returned_particles);
+        bool merge(vector<Particle>& returned_particles, vector<Particle>& local_particles);
         bool evolve(vector<Particle>& local_particles, vector<Particle>& remote_particles);
 };
