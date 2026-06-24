@@ -66,3 +66,35 @@ bool ParticleSimulator::evolve(vector<Particle>& local_particles, vector<Particl
         }
     return true;
 }
+
+bool ParticleSimulator::merge(vector<Particle>& returned_particles, vector<Particle>& local_particles) {
+     #pragma omp parallel for schedule(static)
+    for (size_t i = 0; i < local_particles.size(); i++) {
+
+        local_particles[i].fx += returned_particles[i].fx;
+        local_particles[i].fy += returned_particles[i].fy;
+        local_particles[i].fz += returned_particles[i].fz;
+    }
+    return true;
+}
+
+bool ParticleSimulator::update_Properties() {
+    #pragma omp parallel for schedule(static)
+    for (size_t i = 0; i < local_particles.size(); i++){
+        local_particles[i].ax = local_particles[i].fx / local_particles[i].mass;
+        local_particles[i].ay = local_particles[i].fy / local_particles[i].mass;
+        local_particles[i].az = local_particles[i].fz / local_particles[i].mass;
+
+        local_particles[i].vx += local_particles[i].ax * 0.1;
+        local_particles[i].vy += local_particles[i].ay * 0.1;
+        local_particles[i].vz += local_particles[i].az * 0.1;
+
+        local_particles[i].x += local_particles[i].vx * 0.1;
+        local_particles[i].y += local_particles[i].vy * 0.1;
+        local_particles[i].z += local_particles[i].vz *0.1;
+
+        local_particles[i].fx = 0.0 ;
+        local_particles[i].fy = 0.0 ;
+        local_particles[i].fz = 0.0 ;
+    }
+}
