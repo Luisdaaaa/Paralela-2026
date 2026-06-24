@@ -1,24 +1,26 @@
 #include "particle_sim.hpp"
 
-ParticleSimulator::ParticleSimulator(int N, int iterations, bool bandera_imp, bool INI) {
+ParticleSimulator::ParticleSimulator(int N, int iterations, int bandera_imp, int INI, int rank, int size) : rank(rank), size(size) {
     this->N = N;
     this->iterations = iterations;
     this->bandera_imp = bandera_imp;
     this->INI = INI;
+    this->size = size;
+    this->rank = rank;
 }
 
-void ParticleSimulator::initialize_particles(int total_processes, int rank) {
+void ParticleSimulator::initialize_particles( int rank) {
     srand(rank * 12345);
     int vector_length = this->N; 
     local_particles.resize(vector_length);
     remote_particles.resize(vector_length);
     for (int i = 0; i < vector_length; i++) {
-        local_particles[i].x = static_cast<double>(rand()) / RAND_MAX;
-        local_particles[i].y = static_cast<double>(rand()) / RAND_MAX;
-        local_particles[i].z = static_cast<double>(rand()) / RAND_MAX;
-        local_particles[i].vx = static_cast<double>(rand()) / RAND_MAX;
-        local_particles[i].vy = static_cast<double>(rand()) / RAND_MAX;
-        local_particles[i].vz = static_cast<double>(rand()) / RAND_MAX;
+        local_particles[i].x = static_cast<double>(rand()) / 500.0;
+        local_particles[i].y = static_cast<double>(rand()) / 500.0;
+        local_particles[i].z = static_cast<double>(rand()) / 500.0;
+        local_particles[i].vx = static_cast<double>(rand()) / 500.0;
+        local_particles[i].vy = static_cast<double>(rand()) / 500.0;
+        local_particles[i].vz = static_cast<double>(rand()) / 500.0;
         local_particles[i].ax = 0.0;
         local_particles[i].ay = 0.0;
         local_particles[i].az = 0.0;
@@ -97,4 +99,18 @@ bool ParticleSimulator::update_Properties() {
         local_particles[i].fy = 0.0 ;
         local_particles[i].fz = 0.0 ;
     }
+    return true;
+}
+
+bool ParticleSimulator::execute_simulation() {
+    for (int iter = 0; iter < iterations; iter++) {
+        for(int p = 0; p < (size - 1)/2; p++) {
+            
+            MPI_Send(&total, 1, MPI_INT, (rank+1), 0, MPI_COMM_WORLD);
+            MPI_Recv(&total, 1, MPI_INT, (size-1), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        }
+        
+        
+    }
+    return true;
 }

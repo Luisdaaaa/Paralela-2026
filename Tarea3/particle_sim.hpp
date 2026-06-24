@@ -2,6 +2,7 @@
 #include <vector>
 #include <cstdlib>
 #include <cmath>
+#include <mpi.h>
 using namespace std;
 
 class ParticleSimulator {
@@ -10,11 +11,13 @@ class ParticleSimulator {
         vector<Particle> remote_particles;
         int N; // Number of particles
         int iterations; // Number of iterations
-        bool bandera_imp; // Flag for printing vtk files
-        bool INI; //Particle static initialization
+        int bandera_imp; // Flag for printing vtk files
+        int INI; //Particle static initialization
+        int rank; // Rank of the process
+        int size; // Total number of processes
     public:
-        ParticleSimulator(int N, int iterations, bool bandera_imp, bool INI);
-        void initialize_particles(int total_processes, int rank);
+        ParticleSimulator(int N, int iterations, int bandera_imp, int INI, int rank, int size);
+        void initialize_particles( int rank);
         bool execute_simulation();
         bool update_Properties();
         bool merge(vector<Particle>& returned_particles, vector<Particle>& local_particles);
