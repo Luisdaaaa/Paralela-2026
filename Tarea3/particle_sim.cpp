@@ -70,7 +70,7 @@ bool ParticleSimulator::evolve(vector<Particle>& local_particles, vector<Particl
 }
 
 bool ParticleSimulator::merge(vector<Particle>& returned_particles, vector<Particle>& local_particles) {
-     #pragma omp parallel for schedule(static)
+    #pragma omp parallel for schedule(static)
     for (size_t i = 0; i < local_particles.size(); i++) {
 
         local_particles[i].fx += returned_particles[i].fx;
@@ -102,21 +102,24 @@ bool ParticleSimulator::update_Properties() {
     return true;
 }
 
-bool ParticleSimulator::execute_simulation() {
+void ParticleSimulator::execute_simulation() {
     int destino = (rank + 1) % size;          
     int origen  = (rank - 1 + size) % size;
-    this->particle_Create();
+    MPI_Datatype MPI_PARTICLE = this->particle_Create();
 
-    std::vector<Particula> total_particles;
+    std::vector<Particle> total_particles;
     if (rank == 0) {
         total_particles.resize(N * size); 
     }
     
 
-    std::vector<Particula> remotas_entrantes(N);
-    std::vector<Particula> locales_devueltas(N);
+    std::vector<Particle> remotas_entrantes(N);
+    std::vector<Particle> locales_devueltas(N);
 
     for (int iter = 0; iter < iterations; iter++) {
+        if (rank == 0) {
+            std::cout << "Starting iteration " << iter + 1 << std::endl;
+        }
         MPI_Sendrecv(
             local_particles.data(),  N, MPI_PARTICLE, destino, 0,
             remote_particles.data(), N, MPI_PARTICLE, origen,  0,
@@ -147,15 +150,18 @@ bool ParticleSimulator::execute_simulation() {
         evolve(local_particles, local_particles);
         update_Properties();
 
-        if (bandera_imp && iter % 100 == 0) {
+        if (bandera_imp && iter % 50 == 0) {
             MPI_Gather(local_particles.data(), N, MPI_PARTICLE, 
             total_particles.data(), N, MPI_PARTICLE, 0, MPI_COMM_WORLD);
             
             if (rank == 0) {
-                export::export_to_vtk(total_particles, iter + 1);
+                std::cout << "Exporting data for iteration " << iter  << std::endl;
+                Export::export_to_vtk(total_particles, iter );
+                std::cout << "Export completed for iteration " << iter  << std::endl;
             }
         }
-    return true;
+    }
+    MPI_Type_free(&MPI_PARTICLE);
 }
 
 MPI_Datatype ParticleSimulator::particle_Create() {

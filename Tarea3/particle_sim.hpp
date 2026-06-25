@@ -1,8 +1,8 @@
-#include "particle.hpp"
 #include <vector>
 #include <cstdlib>
 #include <cmath>
 #include <mpi.h>
+#include "export.hpp"
 using namespace std;
 
 class ParticleSimulator {
@@ -18,7 +18,7 @@ class ParticleSimulator {
     public:
         ParticleSimulator(int N, int iterations, int bandera_imp, int INI, int rank, int size);
         void initialize_particles( int rank);
-        bool execute_simulation();
+        void execute_simulation();
         bool update_Properties();
         bool merge(vector<Particle>& returned_particles, vector<Particle>& local_particles);
         bool evolve(vector<Particle>& local_particles, vector<Particle>& remote_particles);

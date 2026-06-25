@@ -30,7 +30,6 @@ int main(int argc, char** argv) {
     sim.initialize_particles(rank);
     sim.execute_simulation();
 
-    MPI_Type_free(&MPI_PARTICLE);
     MPI_Finalize();
     return 0;
 }

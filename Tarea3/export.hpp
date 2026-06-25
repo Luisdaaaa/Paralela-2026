@@ -5,7 +5,7 @@
 class Export { 
 public:
     static void export_to_vtk(const std::vector<Particle>& particles, int iteration) {
-        std::ofstream file("particles_" + std::to_string(iteration) + ".vtk");
+        std::ofstream file("./Paraview/particles_" + std::to_string(iteration) + ".vtk");
         
         file << "# vtk DataFile Version 3.0\n";
         file << "Particle data\n";
