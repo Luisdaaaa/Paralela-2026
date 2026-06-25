@@ -103,14 +103,80 @@ bool ParticleSimulator::update_Properties() {
 }
 
 bool ParticleSimulator::execute_simulation() {
+    int destino = (rank + 1) % size;          
+    int origen  = (rank - 1 + size) % size;
+    this->particle_Create();
+
+    std::vector<Particula> total_particles;
+    if (rank == 0) {
+        total_particles.resize(N * size); 
+    }
+    
+
+    std::vector<Particula> remotas_entrantes(N);
+    std::vector<Particula> locales_devueltas(N);
+
     for (int iter = 0; iter < iterations; iter++) {
+        MPI_Sendrecv(
+            local_particles.data(),  N, MPI_PARTICLE, destino, 0,
+            remote_particles.data(), N, MPI_PARTICLE, origen,  0,
+            MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
         for(int p = 0; p < (size - 1)/2; p++) {
             
-            MPI_Send(&total, 1, MPI_INT, (rank+1), 0, MPI_COMM_WORLD);
-            MPI_Recv(&total, 1, MPI_INT, (size-1), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            evolve(local_particles, remote_particles);
+
+            if(p < (size - 1)/2 - 1) {
+                MPI_Sendrecv(remote_particles.data(),  N, MPI_PARTICLE, destino, 0,
+                remotas_entrantes.data(), N, MPI_PARTICLE, origen,  0,
+                MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                
+                remote_particles.swap(remotas_entrantes);
+            }
         }
         
-        
-    }
+        int owner = (rank - (size - 1)/2 + size) % size;
+        int my_particles = (rank + (size - 1)/2) % size;
+
+        MPI_Sendrecv(
+            remote_particles.data(),  N, MPI_PARTICLE, owner, 0,
+            locales_devueltas.data(), N, MPI_PARTICLE, my_particles,0,
+            MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+        merge(locales_devueltas, local_particles);
+        evolve(local_particles, local_particles);
+        update_Properties();
+
+        if (bandera_imp && iter % 100 == 0) {
+            MPI_Gather(local_particles.data(), N, MPI_PARTICLE, 
+            total_particles.data(), N, MPI_PARTICLE, 0, MPI_COMM_WORLD);
+            
+            if (rank == 0) {
+                export::export_to_vtk(total_particles, iter + 1);
+            }
+        }
     return true;
+}
+
+MPI_Datatype ParticleSimulator::particle_Create() {
+    MPI_Datatype MPI_PARTICLE;
+
+    int count = 5; 
+    int blocklengths[5] = {3, 3, 3, 3, 1}; 
+
+    MPI_Datatype types[5] = {MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE};
+
+    
+    MPI_Aint displacements[5];
+    displacements[0] = offsetof(Particle, x);
+    displacements[1] = offsetof(Particle, vx);
+    displacements[2] = offsetof(Particle, fx);
+    displacements[3] = offsetof(Particle, ax);
+    displacements[4] = offsetof(Particle, mass);
+
+    
+    MPI_Type_create_struct(count, blocklengths, displacements, types, &MPI_PARTICLE);
+    MPI_Type_commit(&MPI_PARTICLE);
+
+    return MPI_PARTICLE;
 }

@@ -22,4 +22,5 @@ class ParticleSimulator {
         bool update_Properties();
         bool merge(vector<Particle>& returned_particles, vector<Particle>& local_particles);
         bool evolve(vector<Particle>& local_particles, vector<Particle>& remote_particles);
+        MPI_Datatype particle_Create();
 };
