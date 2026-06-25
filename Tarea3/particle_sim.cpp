@@ -1,4 +1,5 @@
 #include "particle_sim.hpp"
+#include <iostream>
 
 ParticleSimulator::ParticleSimulator(int N, int iterations, int bandera_imp, int INI, int rank, int size) : rank(rank), size(size) {
     this->N = N;
