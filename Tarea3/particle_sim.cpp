@@ -14,6 +14,7 @@ void ParticleSimulator::initialize_particles( int rank) {
     int vector_length = this->N; 
     local_particles.resize(vector_length);
     remote_particles.resize(vector_length);
+    #pragma omp parallel for schedule(static)
     for (int i = 0; i < vector_length; i++) {
         local_particles[i].x = static_cast<double>(rand()) / 500.0;
         local_particles[i].y = static_cast<double>(rand()) / 500.0;

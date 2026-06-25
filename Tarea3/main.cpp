@@ -14,13 +14,7 @@ int main(int argc, char** argv) {
     
     MPI_Comm_rank ( MPI_COMM_WORLD , & rank ) ;
     MPI_Comm_size ( MPI_COMM_WORLD , & size ) ;
-    if (size %2 == 0) {
-        
-        std::cerr << "Error: The number of processes must be odd." << std::endl;
-        MPI_Finalize();
-
-        return 1;
-    }
+    
     int num_particles = std::stoi(argv[1]);
     int num_iterations = std::stoi(argv[2]);
     int print_flag = std::stoi(argv[3]);
